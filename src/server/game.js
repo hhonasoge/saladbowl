@@ -36,7 +36,6 @@ class Game {
         const roomID = this.socketToRooms[socket.id]
         const room = this.rooms[roomID]
         room.removePlayerFromTeam(socket)
-        // console.log("SOCKETS: ", this.rooms[roomID].sockets)
         socket.leave(roomID);
         delete this.socketToRooms[socket.id]
         delete this.rooms[roomID].players[socket.id]
@@ -45,6 +44,7 @@ class Game {
 
     handleContinue(socket, roomID) {
         const room = this.rooms[roomID]
+        room.shufflePrompts()
         room.pushNewWord(socket)
     }
     
