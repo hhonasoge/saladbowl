@@ -83,6 +83,7 @@ function handleJoinGameWithTeam(username, roomID, teamNumber) {
 }
 
 function handleJoinGame(username, roomID, fn) {
+    roomID = roomID.trim()
     if (game.hasStarted(roomID)) {
         fn(true)
         return
