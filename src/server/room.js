@@ -27,10 +27,15 @@ class Room {
         if (teamNumber !== this.currentTeam) {
             return false
         }
-        if (teamNumber == 1) {
+        if (teamNumber === 1) {
+            console.log("this.team1 ", this.team1)
+            console.log("this.team1[this.team1Index]: ", this.team1[this.team1Index])
+            console.log("this.team1[this.team1Index].socketid: ", this.team1[this.team1Index].socketid)
+            console.log("player: ", player)
+            console.log("player.socketid: ", player.socketid)
             return this.team1[this.team1Index].socketid === player.socketid
         }
-        if (teamNumber == 2) {
+        if (teamNumber === 2) {
             return this.team2[this.team2Index].socketid === player.socketid
         }
     }

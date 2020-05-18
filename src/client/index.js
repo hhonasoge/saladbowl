@@ -177,7 +177,7 @@ export function renderHasStartedScreen() {
             alert("you gotta enter a legit username ok")
             return
         }
-        if (teamNumber.value.trim().length == 0) {
+        if (teamNumber.value.trim().length == 0 || isNaN(teamNumber.value)) {
             alert("you gotta enter a legit room ID ok")
             return
         }
