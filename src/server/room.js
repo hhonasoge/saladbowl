@@ -51,7 +51,9 @@ class Room {
                 if (this.team1Index === this.team1.length) {
                     this.team1Index = 0
                 }
-                this.pushStartTurn()
+                if (this.team1.length > 0) {
+                    this.pushStartTurn()
+                }
                 return
             }
         }
@@ -61,7 +63,9 @@ class Room {
                 if (this.team2Index === this.team2.length) {
                     this.team2Index = 0
                 }
-                this.pushStartTurn()
+                if (this.team2.length > 0) {
+                    this.pushStartTurn()
+                }
                 return
             }
         }
