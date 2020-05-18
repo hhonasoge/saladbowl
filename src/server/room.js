@@ -28,14 +28,6 @@ class Room {
             return false
         }
         if (teamNumber === 1) {
-            console.log("this.team1 ", this.team1)
-            console.log("this.team1 index ", this.team1Index)
-            console.log("this.team1[this.team1Index]: ", this.team1[this.team1Index])
-            console.log("this.team1[this.team1Index].socketid: ", this.team1[this.team1Index].socketid)
-            console.log("player: ", player)
-            console.log("player.socketid: ", player.socketid)
-            console.log("this.team2 ", this.team1)
-            console.log("this.team2 ", this.team2Index)
             return this.team1[this.team1Index].socketid === player.socketid
         }
         if (teamNumber === 2) {
@@ -45,7 +37,6 @@ class Room {
 
     removePlayerFromTeam(socket) {
         for (var i = 0; i < this.team1.length; i++) {
-            console.log("I: ", i)
             if (this.team1[i].socketid === socket.id) {
                 this.team1.splice(i, 1)
                 if (this.team1Index === this.team1.length) {
