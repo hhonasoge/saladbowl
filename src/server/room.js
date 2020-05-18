@@ -47,21 +47,21 @@ class Room {
         for (var i = 0; i < this.team1.length; i++) {
             console.log("I: ", i)
             if (this.team1[i].socketid === socket.id) {
-                if (this.isPlayersTurn(this.team1[i])) {
-                    this.incrementTeamIndex()
-                    this.pushStartTurn()
-                }
                 this.team1.splice(i, 1)
+                if (this.team1Index === this.team1.length) {
+                    this.team1Index = 0
+                }
+                this.pushStartTurn()
                 return
             }
         }
         for (var i = 0; i < this.team2.length; i++) {
             if (this.team2[i].socketid === socket.id) {
-                if (this.isPlayersTurn(this.team2[i])) {
-                    this.incrementTeamIndex()
-                    this.pushStartTurn()
-                }
                 this.team2.splice(i, 1)
+                if (this.team2Index === this.team2.length) {
+                    this.team2Index = 0
+                }
+                this.pushStartTurn()
                 return
             }
         }
