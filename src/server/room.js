@@ -22,17 +22,8 @@ class Room {
         this.prompts.sort(() => Math.random() - 0.5);
     }
 
-    isPlayersTurn(player) {
-        var teamNumber =  player.teamNumber
-        if (teamNumber !== this.currentTeam) {
-            return false
-        }
-        if (teamNumber === 1) {
-            return this.team1[this.team1Index].socketid === player.socketid
-        }
-        if (teamNumber === 2) {
-            return this.team2[this.team2Index].socketid === player.socketid
-        }
+    isEmpty() {
+        return this.team1.length == 0 && this.team2.length == 0 && Object.keys(this.players).length == 0 && Object.keys(this.sockets).length == 0
     }
 
     removePlayerFromTeam(socket) {
@@ -80,7 +71,7 @@ class Room {
     }
 
     iterateNextWord(socket) {
-        if (this.currentPromptIndex  == this.prompts.length-1) {
+        if (this.currentPromptIndex === this.prompts.length-1) {
             // we're at the end of the list
             if (this.currentRound == 3) {
                 // game is done
@@ -152,10 +143,18 @@ class Room {
         console.log("starting turn")
         if (this.currentTeam == 1) {
             const currPlayer = this.team1[this.team1Index]
+            if (currPlayer  === undefined) {
+                console.log("unable to push start turn. currPlayer is undefined")
+                return
+            }
             const socket = this.sockets[currPlayer.socketid]
             this.pushNewWord(socket)
         } else {
             const currPlayer = this.team2[this.team2Index]
+            if (currPlayer  === undefined) {
+                console.log("unable to push start turn. currPlayer is undefined")
+                return
+            }
             const socket = this.sockets[currPlayer.socketid]
             this.pushNewWord(socket)
         }

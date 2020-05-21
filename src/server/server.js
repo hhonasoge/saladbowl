@@ -49,37 +49,61 @@ function onDisconnect() {
 
 function handleContinue() {
     roomID = game.socketToRooms[this.id]
+    if (roomID === undefined) {
+        console.log('unable to continue. room is undefined')
+        return
+    }
     game.handleContinue(this, roomID)
 }
 
 function handleFinishTurn() {
     roomID = game.socketToRooms[this.id]
+    if (roomID === undefined) {
+        console.log('unable to finish turn. room is undefined')
+        return
+    }
     game.handleFinishTurn(this, roomID)
 }
 
 function handleNextWord(fn) {
     roomID = game.socketToRooms[this.id]
+    if (roomID === undefined) {
+        console.log('unable to handle next word. room is undefined')
+        return
+    }
     var word = game.handleNextWord(this, roomID)
     if (word !== "") {
         fn(word)
     }
 }
 
-function startGameInRoom() {
+function startGameInRoom(fn) {
     roomID = game.socketToRooms[this.id]
+    if (roomID === undefined) {
+        console.log('unable to start game in room. room is undefined')
+        return
+    }
+    if (!game.hasEnoughPlayers(roomID)) {
+        fn(false, 'The game needs at least 2 players')
+        return
+    }
     game.assignTeams(roomID)
     game.shufflePrompts(roomID)
     game.pushStartTurn(roomID)
+    fn(true, '')
 }
 
 function handleSubmitPrompts(inputs) {
     roomID = game.socketToRooms[this.id]
+    if (roomID === undefined) {
+        console.log('unable to submit prompts. room is undefined')
+        return
+    }
     game.addPrompts(roomID, inputs)
 }
 
 function handleJoinGameWithTeam(username, roomID, teamNumber) {
     game.addPlayerWithTeam(this, username, roomID, teamNumber)
-    // fn(data{hasStarted: game.hasStarted(roomID)})
 }
 
 function handleJoinGame(username, roomID, fn) {
@@ -90,5 +114,4 @@ function handleJoinGame(username, roomID, fn) {
     }
     fn(false)
     game.addPlayer(this, username, roomID)
-    // fn(data{hasStarted: game.hasStarted(roomID)})
 }

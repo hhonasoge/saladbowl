@@ -23,7 +23,6 @@ const connectedPromise = new Promise(resolve => {
   export const connect = onGameOver => (
     connectedPromise.then(() => {
       // Register callbacks
-      socket.on(Constants.MSG_TYPES.SERVER_START_GAME, serverStartUpdate);
       socket.on(Constants.MSG_TYPES.GAME_COMPLETE, onGameOver);
       socket.on(Constants.MSG_TYPES.TEAM_NUMBER, renderTeamNumberScreen)
       socket.on(Constants.MSG_TYPES.SERVER_PUSH_WORD, renderWord)
@@ -219,15 +218,6 @@ export function renderInputScreen() {
       gameBackground.appendChild(button)
 }
 
-export const serverStartUpdate = () => {
-    var body = document.getElementsByClassName(gameBackgroundName)[0]
-    body.innerHTML = ''
-    var body = document.getElementsByClassName(gameBackgroundName)[0]
-    var button = document.createElement("button");
-    button.innerHTML = "Starting game!";
-    body.appendChild(button)
-}
-
 export const renderReadyButton = () => {
     var body = document.getElementsByClassName(gameBackgroundName)[0]
     body.innerHTML = ''
@@ -244,7 +234,11 @@ export const renderReadyButton = () => {
 }
 
 export const startGame = () => {
-    socket.emit(Constants.MSG_TYPES.START_GAME)
+    socket.emit(Constants.MSG_TYPES.START_GAME, function(isValid, reason){
+        if (!isValid) {
+            alert(reason)
+        }
+    })
 }
 
 export const submitWords = (input1, input2, input3, input4, input5) => {
