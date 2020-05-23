@@ -4,6 +4,7 @@ class Player {
         this.username = username;
         this.room = room
         this.teamNumber = 0;
+        this.score = 0;
     }
 }
 

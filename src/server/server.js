@@ -49,7 +49,7 @@ function onDisconnect() {
 
 function handleContinue() {
     roomID = game.socketToRooms[this.id]
-    if (roomID === undefined) {
+    if (!roomID) {
         console.log('unable to continue. room is undefined')
         return
     }
@@ -58,7 +58,7 @@ function handleContinue() {
 
 function handleFinishTurn() {
     roomID = game.socketToRooms[this.id]
-    if (roomID === undefined) {
+    if (!roomID) {
         console.log('unable to finish turn. room is undefined')
         return
     }
@@ -67,7 +67,7 @@ function handleFinishTurn() {
 
 function handleNextWord(fn) {
     roomID = game.socketToRooms[this.id]
-    if (roomID === undefined) {
+    if (!roomID) {
         console.log('unable to handle next word. room is undefined')
         return
     }
@@ -79,7 +79,7 @@ function handleNextWord(fn) {
 
 function startGameInRoom(fn) {
     roomID = game.socketToRooms[this.id]
-    if (roomID === undefined) {
+    if (!roomID) {
         console.log('unable to start game in room. room is undefined')
         return
     }
@@ -95,7 +95,7 @@ function startGameInRoom(fn) {
 
 function handleSubmitPrompts(inputs) {
     roomID = game.socketToRooms[this.id]
-    if (roomID === undefined) {
+    if (!roomID) {
         console.log('unable to submit prompts. room is undefined')
         return
     }

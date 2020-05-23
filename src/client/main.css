@@ -10,6 +10,20 @@ input {
   display: inline-block;
 }
 
+#info-modal {
+  overflow: hidden;
+  background-color: #cfe2a1;
+  border-bottom: solid green 1px;
+}
+
+#info-modal li {
+  float: left;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+  font-size: 17px;
+}
+
 .game-background {
   display: grid;
   position: fixed; /* or absolute */

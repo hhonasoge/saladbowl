@@ -143,7 +143,7 @@ class Room {
         console.log("starting turn")
         if (this.currentTeam == 1) {
             const currPlayer = this.team1[this.team1Index]
-            if (currPlayer  === undefined) {
+            if (!currPlayer) {
                 console.log("unable to push start turn. currPlayer is undefined")
                 return
             }
@@ -151,7 +151,7 @@ class Room {
             this.pushNewWord(socket)
         } else {
             const currPlayer = this.team2[this.team2Index]
-            if (currPlayer  === undefined) {
+            if (!currPlayer) {
                 console.log("unable to push start turn. currPlayer is undefined")
                 return
             }
@@ -161,23 +161,43 @@ class Room {
     }
 
     pushNewWord(socket) {
-        if (socket) {
-            socket.emit(Constants.MSG_TYPES.SERVER_PUSH_WORD, {
-                word: this.prompts[this.currentPromptIndex]
-            })
+        if (!socket) {
+            console.log("can't push new word, socket is null")
+            return
         }
-    }
-
-    updatePlayersWithTeam() {
-        Object.keys(this.sockets).forEach(socketID => {
-            const socket = this.sockets[socketID];
-            const teamNumber = this.players[socketID].teamNumber
-            this.updatePlayerWithTeam(socket, teamNumber)
+        socket.emit(Constants.MSG_TYPES.SERVER_PUSH_WORD, {
+            word: this.prompts[this.currentPromptIndex]
         })
     }
 
-    updatePlayerWithTeam(socket, teamNumber) {
-        socket.emit(Constants.MSG_TYPES.TEAM_NUMBER, {team: teamNumber})
+    updatePlayersWithGameInfo() {
+        Object.keys(this.sockets).forEach(socketID => {
+            const socket = this.sockets[socketID];
+            this.updatePlayerWithGameInfo(socket)
+        })
+    }
+
+    updatePlayerWithGameInfo(socket) {
+        if (!socket) {
+            console.log("cannot update player, socket is null")
+            return
+        }
+        const player = this.players[socket.id]
+        if (!player) {
+            console.log("can't update player, player is null")
+            return
+        }
+        socket.emit(Constants.MSG_TYPES.GAME_INFO, 
+            {
+                username: player.username,
+                room: player.room,
+                team: player.teamNumber,
+                personalScore: player.score,
+                team1Score: this.team1Score,
+                team2Score: this.team2Score,
+                round: Constants.ROUND[this.currentRound]
+            }
+        )
     }
 }
 

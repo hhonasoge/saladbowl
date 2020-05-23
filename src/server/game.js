@@ -16,7 +16,7 @@ class Game {
         }
         console.log(`adding new player to room: player: ${username}, roomID: ${roomID}, socket: ${socket}`)
         const room = this.rooms[roomID];
-        if (roomID === undefined) {
+        if (!roomID) {
             console.log('unable add player. room is undefined')
             return
         }
@@ -30,12 +30,12 @@ class Game {
         console.log(`adding new player to room with team: player: ${username}, roomID: ${roomID}, socket: ${socket}, teamNumber: ${teamNumber}`)
         this.addPlayer(socket, username, roomID)
         const room = this.rooms[roomID];
-        if (roomID === undefined) {
+        if (!roomID) {
             console.log('unable add player to team. room is undefined')
             return
         }
         const player = room.players[socket.id]
-        if (player === undefined) {
+        if (!player) {
             console.log('unable add player to team. player is undefined')
             return
         }
@@ -68,7 +68,7 @@ class Game {
     handleContinue(socket, roomID) {
         console.log('continuing...')
         const room = this.rooms[roomID]
-        if (roomID === undefined) {
+        if (!roomID) {
             console.log('unable to continue. room is undefined')
             return
         }
@@ -79,12 +79,13 @@ class Game {
     handleNextWord(socket, roomID) {
         console.log('handling next word')
         const room = this.rooms[roomID]
-        if (roomID === undefined) {
+        if (!roomID) {
             console.log('unable handle next word. room is undefined')
             return
         }
         room.incrementScore()
         var word = room.iterateNextWord(socket)
+        room.updatePlayersWithGameInfo()
         return word
     }
 
@@ -94,22 +95,23 @@ class Game {
         room.incrementTeamIndex()
         room.switchTeams()
         room.pushStartTurn()
+        room.updatePlayersWithGameInfo()
     }
 
     assignTeams(roomID) {
         console.log('assigning teams')
         const room = this.rooms[roomID]
-        if (roomID === undefined) {
+        if (!roomID) {
             console.log('unable to assign teams. room is undefined')
             return
         }
         room.assignTeamsToPlayers()
-        room.updatePlayersWithTeam()
+        room.updatePlayersWithGameInfo()
     }
 
     shufflePrompts(roomID) {
         const room = this.rooms[roomID]
-        if (roomID === undefined) {
+        if (!roomID) {
             console.log('unable to shuffle prompts. room is undefined')
             return
         }
@@ -119,7 +121,7 @@ class Game {
     pushStartTurn(roomID) {
         console.log('starting turn')
         const room = this.rooms[roomID]
-        if (roomID === undefined) {
+        if (!roomID) {
             console.log('unable to push start turn. room is undefined')
             return
         }
@@ -132,7 +134,7 @@ class Game {
             return false
         }
         const room = this.rooms[roomID]
-        if (roomID === undefined) {
+        if (!roomID) {
             console.log('failed to get hasStarted. room is undefined')
             return
         }
