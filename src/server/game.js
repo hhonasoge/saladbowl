@@ -84,6 +84,12 @@ class Game {
             return
         }
         room.incrementScore()
+        const player = room.players[socket.id]
+        if (!player) {
+            console.log('cannot update personal score, player is null')
+        } else {
+            player.score++
+        }
         var word = room.iterateNextWord(socket)
         room.updatePlayersWithGameInfo()
         return word
