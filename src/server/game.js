@@ -40,7 +40,7 @@ class Game {
             return
         }
         room.addPlayerToTeam(player, teamNumber)
-        room.updatePlayerWithTeam(socket, teamNumber)
+        room.updatePlayerWithGameInfo(socket)
     }
 
     hasEnoughPlayers(roomID) {
@@ -100,8 +100,9 @@ class Game {
         const room = this.rooms[roomID]
         room.incrementTeamIndex()
         room.switchTeams()
-        room.pushStartTurn()
         room.updatePlayersWithGameInfo()
+        room.updatePlayersWithNextPlayerInfo()
+        room.pushStartTurn()
     }
 
     assignTeams(roomID) {
@@ -113,6 +114,7 @@ class Game {
         }
         room.assignTeamsToPlayers()
         room.updatePlayersWithGameInfo()
+        room.updatePlayersWithNextPlayerInfo()
     }
 
     shufflePrompts(roomID) {

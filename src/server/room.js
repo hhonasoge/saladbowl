@@ -73,7 +73,7 @@ class Room {
     iterateNextWord(socket) {
         if (this.currentPromptIndex === this.prompts.length-1) {
             // we're at the end of the list
-            if (this.currentRound == 3) {
+            if (this.currentRound === 3) {
                 // game is done
                 Object.keys(this.sockets).forEach(socketID => {
                     const socket = this.sockets[socketID];
@@ -141,7 +141,7 @@ class Room {
 
     pushStartTurn() {
         console.log("starting turn")
-        if (this.currentTeam == 1) {
+        if (this.currentTeam === 1) {
             const currPlayer = this.team1[this.team1Index]
             if (!currPlayer) {
                 console.log("unable to push start turn. currPlayer is undefined")
@@ -199,6 +199,42 @@ class Room {
             }
         )
     }
+
+    updatePlayersWithNextPlayerInfo() {
+        Object.keys(this.sockets).forEach(socketID => {
+            const socket = this.sockets[socketID];
+            this.updatePlayerWithNextPlayerInfo(socket)
+        })
+    }
+
+    updatePlayerWithNextPlayerInfo(socket) {
+        if (!socket) {
+            console.log("cannot update player with team info, socket is null")
+            return
+        }
+        const player = this.players[socket.id]
+        if (!player) {
+            console.log("can't update player with team info, player is null")
+            return
+        }
+        let currPlayerName = this.team1[this.team1Index].username
+        let nextPlayerName = this.team2[this.team2Index].username
+        if (this.currentTeam === 2) {
+            let tmp = currPlayerName
+            currPlayerName = nextPlayerName
+            nextPlayerName = tmp
+        }
+        socket.emit(Constants.MSG_TYPES.NEXT_TURN, 
+            {
+                username: player.username,
+                currPlayerName: currPlayerName,
+                nextPlayerName: nextPlayerName,
+                currTeam: this.currentTeam,
+                nextTeam: (this.currentTeam === 1) ? 2: 1
+            }
+        )
+    }
+
 }
 
 module.exports = Room;

@@ -6,6 +6,7 @@ module.exports = Object.freeze({
         START_GAME: 'client-start-game',
         GAME_INFO: 'game-info',
         SERVER_PUSH_WORD: 'push-word',
+        NEXT_TURN: 'next-turn',
         FINISH_TURN: 'finish-turn',
         ROUND_COMPLETE: 'round-complete',
         GAME_COMPLETE: 'game-complete',

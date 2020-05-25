@@ -27,6 +27,7 @@ const connectedPromise = new Promise(resolve => {
       socket.on(Constants.MSG_TYPES.GAME_COMPLETE, onGameOver);
       socket.on(Constants.MSG_TYPES.GAME_INFO, renderGameInfoModal)
       socket.on(Constants.MSG_TYPES.SERVER_PUSH_WORD, renderWord)
+      socket.on(Constants.MSG_TYPES.NEXT_TURN, renderWhoIsUpNextScreen)
       socket.on(Constants.MSG_TYPES.ROUND_COMPLETE, renderRoundComplete)
       socket.on('disconnect', () => {
         console.log('Disconnected from server.');
@@ -122,22 +123,12 @@ export function renderWord(update) {
         }
         finishTurnButton.onclick = () => {
             socket.emit(Constants.MSG_TYPES.FINISH_TURN)
-            renderIdleScreen()
         }
         body.appendChild(gotWordButton)
         body.appendChild(finishTurnButton)
     }
     body.appendChild(readyText)
     body.appendChild(wordTextButton)
-}
-
-export function renderIdleScreen() {
-    console.log('renderIdleScreen invoked')
-    var body = document.getElementsByClassName(gameClassName)[0]
-    body.innerHTML= ''
-    const randomFact = document.createElement("p")
-    randomFact.innerHTML= "It's not your turn. I don't have much more for you right now."
-    body.appendChild(randomFact)
 }
 
 export function renderGameInfoModal(update) {
@@ -179,13 +170,34 @@ export function renderGameInfoModal(update) {
     var roundNode = document.createTextNode(`Round: ${update.round}`)
     round.appendChild(roundNode)
 
+    // set round
+    var username = document.createElement("li")
+    var usernameNode = document.createTextNode(`Your Username: ${update.username}`)
+    username.appendChild(usernameNode)
+
     modalList.appendChild(teamNumber)
     modalList.appendChild(team1Score)
     modalList.appendChild(team2Score)
     modalList.appendChild(personalScore)
     modalList.appendChild(round)
     modalList.appendChild(roomCode)
+    modalList.appendChild(username)
     infoModal.appendChild(modalList)
+}
+
+export function renderWhoIsUpNextScreen(update) {
+    var gameBackground = document.getElementsByClassName(gameClassName)[0]
+    gameBackground.innerHTML = ''
+    var currPlayer = document.createElement("h1")
+    currPlayer.innerHTML = `It's ${update.currPlayerName}'s turn`
+    var nextPlayer = document.createElement("h2")
+    let nextPlayerText = `${update.nextPlayerName} is up next`
+    if (update.nextPlayerName === update.username) {
+        nextPlayerText = `You're up next!`
+    }
+    nextPlayer.innerHTML = nextPlayerText
+    gameBackground.appendChild(currPlayer)
+    gameBackground.appendChild(nextPlayer)
 }
 
 export function renderHasStartedScreen() {
