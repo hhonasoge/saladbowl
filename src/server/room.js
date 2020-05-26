@@ -203,6 +203,8 @@ class Room {
     updatePlayersWithNextPlayerInfo() {
         Object.keys(this.sockets).forEach(socketID => {
             const socket = this.sockets[socketID];
+            console.log("SOCKET ID: ", socketID)
+            console.log("SOCKETS: ", this.sockets)
             this.updatePlayerWithNextPlayerInfo(socket)
         })
     }
@@ -224,6 +226,8 @@ class Room {
             currPlayerName = nextPlayerName
             nextPlayerName = tmp
         }
+        console.log(`updating player with next player info: 
+        username: ${player.username}, currPlayerName: ${currPlayerName}, nextPlayerName: ${nextPlayerName}, currTeam: ${this.currentTeam}, nextTeam: ${nextTeam}`)
         socket.emit(Constants.MSG_TYPES.NEXT_TURN, 
             {
                 username: player.username,
