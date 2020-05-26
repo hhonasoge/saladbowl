@@ -1,5 +1,6 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 
 module.exports = {
@@ -7,8 +8,7 @@ module.exports = {
     game: './src/client/index.js',
   },
   output: {
-    filename: '[name].[contenthash].js',
-    path: path.resolve(__dirname, 'dist'),
+    filename: './bundle.js'
   },
   module: {
     rules: [
@@ -24,24 +24,27 @@ module.exports = {
       },
       {
         test: /\.css$/,
-        use: ['style-loader', 'css-loader'],
+        use: [
+          MiniCssExtractPlugin.loader,
+          'css-loader'
+        ]
       },
-      { 
+      {
         test: /\.(png|jpg)$/,
         use: {
           loader: 'file-loader',
           options: {
-            name: '[path][name].[ext]',
             esModule: false,
           },
         },
-     }
+      }
     ],
   },
   plugins: [
     new HtmlWebpackPlugin({
       filename: 'index.html',
-      template: 'src/client/html/index.html'
+      template: 'src/client/index.html'
     }),
+    new MiniCssExtractPlugin()
   ],
 };
