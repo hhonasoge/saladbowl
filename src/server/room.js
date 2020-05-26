@@ -203,8 +203,6 @@ class Room {
     updatePlayersWithNextPlayerInfo() {
         Object.keys(this.sockets).forEach(socketID => {
             const socket = this.sockets[socketID];
-            console.log("SOCKET ID: ", socketID)
-            console.log("SOCKETS: ", this.sockets)
             this.updatePlayerWithNextPlayerInfo(socket)
         })
     }
