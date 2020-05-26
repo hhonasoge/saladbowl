@@ -26,7 +26,7 @@ const server = app.listen(port);
 console.log(`Server listening on port ${port}`);
 
 // Setup socket.io
-const io = socketio(server);
+const io = socketio(server, {pingTimeout: 60000});
 
 // Listen for socket.io connections
 io.on('connection', socket => {
