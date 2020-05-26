@@ -14,7 +14,7 @@ class Game {
             console.log("room does not exist, creating new room: ", roomID)
             this.rooms[roomID] = new Room(roomID)
         }
-        console.log(`adding new player to room: player: ${username}, roomID: ${roomID}, socket: ${socket}`)
+        console.log(`adding new player to room: player: ${username}, roomID: ${roomID}, socket id: ${socket.id}`)
         const room = this.rooms[roomID];
         if (!roomID) {
             console.log('unable add player. room is undefined')
@@ -48,9 +48,10 @@ class Game {
     }
 
     removePlayer(socket) {
-        console.log('removing player')
+        console.log(`removing player, socket id: ${socket.id}`)
         if (!(socket.id in this.socketToRooms)) {
-            console.log('player does not exist')
+            console.log(`SOCKET TO ROOMS: ${this.socketToRooms}`)
+            console.log(`player does not exist, socket id: ${socket.id}`)
             return
         }
         const roomID = this.socketToRooms[socket.id]
@@ -58,6 +59,7 @@ class Game {
         room.removePlayerFromTeam(socket)
         socket.leave(roomID);
         delete this.socketToRooms[socket.id]
+        console.log(`removing player, username: ${this.rooms[roomID].players[socket.id].username}`)
         delete this.rooms[roomID].players[socket.id]
         delete this.rooms[roomID].sockets[socket.id]
         if (room.isEmpty()) {
