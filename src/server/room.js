@@ -227,7 +227,7 @@ class Room {
             nextPlayerName = tmp
         }
         console.log(`updating player with next player info: 
-        username: ${player.username}, currPlayerName: ${currPlayerName}, nextPlayerName: ${nextPlayerName}, currTeam: ${this.currentTeam}, nextTeam: ${nextTeam}`)
+        username: ${player.username}, currPlayerName: ${currPlayerName}, nextPlayerName: ${nextPlayerName}, currTeam: ${this.currentTeam}`)
         socket.emit(Constants.MSG_TYPES.NEXT_TURN, 
             {
                 username: player.username,
