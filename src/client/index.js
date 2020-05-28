@@ -1,16 +1,17 @@
 import io from 'socket.io-client';
 import './main.css';
+import 'jquery';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const shortid = require('shortid');
 
 const Constants = require('../shared/constants');
-const playButton = document.getElementById('play-button');
 const createRoomButton = document.getElementById('create-room');
 const usernameInput = document.getElementById('username-input');
 const roomID = document.getElementById('roomID')
-const gameClassName = 'game-background'
-const infoModalClassName = 'info-modal'
+const gameIDName = 'game-background'
+const gameID = '#game-background'
+const infoModalID = '#info-modal'
 
 const socketProtocol = (window.location.protocol.includes('https')) ? 'wss' : 'ws';
 const socket = io(`${socketProtocol}://${window.location.host}`, { reconnection: false });
@@ -42,24 +43,18 @@ const connectedPromise = new Promise(resolve => {
 Promise.all([
     connect(onGameOver),
 ]).then(() => {
-    const element = document.createElement('div');
-    const CoolBackground = new Image();
-    element.src = CoolBackground;
-    document.body.appendChild(element);
-
-playButton.onclick = () => {
+$("#play-button").click(() => {
     console.log(`${socketProtocol}://${window.location.host}`)
-    // Play!
-    if (usernameInput.value.trim().length == 0) {
+    if ($('#username-input').val().trim().length == 0) {
         alert("you gotta enter a legit username ok")
         return
     }
-    if (roomID.value.trim().length == 0) {
+    if ($('#roomID').val().trim().length == 0) {
         alert("you gotta enter a legit room ID ok")
         return
     }
     play(usernameInput.value, roomID.value);
-};
+});
 createRoomButton.onclick = () => {
     var roomClass = document.getElementsByClassName('createRoomClass')
     createRoomButton.classList.add("hidden")
@@ -70,139 +65,93 @@ createRoomButton.onclick = () => {
 };
 }).catch(console.error)
 
-
-function updateGameWithText(text, elementType) {
-    var background = document.getElementsByClassName(gameClassName)[0]
-    background.innerHTML=''
-    const textElement = document.createElement(elementType)
-    textElement.innerHTML = text
-    background.appendChild(textElement)
-}
-
 function onGameOver(update) {
     console.log("game is over")
-    updateGameWithText('The game is complete. Final score. Team 1: ' + update.team1Score + " Team 2: " + update.team2Score, "p")
+    $(gameID).empty()
+    $("<p/>", {
+        html: `The game is complete. Final score. Team 1: ${update.team1Score} Team 2: ${update.team2Score}`
+    }).appendTo(gameID)
   }
 
   export function renderRoundComplete(update) {
-    var body = document.getElementsByClassName(gameClassName)[0]
-    body.innerHTML=''
-    const roundCompleteText = document.createElement("p")
-    roundCompleteText.innerHTML = 'The round is complete. Score so far: Team 1: ' + update.team1Score + " Team 2: " + update.team2Score
-    body.appendChild(roundCompleteText)
-    const continueButton = document.createElement("button")
-    continueButton.innerHTML = 'Continue to next round'
-    continueButton.onclick = () => {
-        socket.emit(Constants.MSG_TYPES.CONTINUE)
-    }
-    body.appendChild(roundCompleteText)
-    body.appendChild(continueButton)
+    $(gameID).empty()
+    $("<p/>", {
+        html: `The round is complete. Score so far: Team 1: ${update.team1Score} Team 2: ${update.team2Score}`
+    }).appendTo(gameID)
+    $("<button/>", {
+        html: 'Continue to next round',
+        click: function() {
+            socket.emit(Constants.MSG_TYPES.CONTINUE)
+        }
+    }).appendTo(gameID)
   }
 
 export function renderWord(update) {
     console.log('renderWord invoked')
-    var body = document.getElementsByClassName(gameClassName)[0]
-    body.innerHTML=''
-    const readyText = document.createElement("p")
-    readyText.innerHTML = "It's your turn. Click the Start button when you're ready!"
-    const wordTextButton = document.createElement("button")
-    wordTextButton.innerHTML = 'Start'
-    wordTextButton.onclick = () => {
-        const shownWork = document.createElement("p")
-        shownWork.innerHTML="Here's your word: " + update.word
-        body.appendChild(shownWork)
-        wordTextButton.style.visibility= 'hidden';
-        const gotWordButton = document.createElement("button")
-        const finishTurnButton = document.createElement("button")
-        gotWordButton.innerHTML = 'Next'
-        finishTurnButton.innerHTML = 'Done with turn'
-        gotWordButton.onclick = () => {
-            socket.emit(Constants.MSG_TYPES.NEXT_WORD, function(data) {
-                shownWork.innerHTML="Here's your word: " + data
-            })
+    $(gameID).empty()
+    $("<p/>", {
+        html: "It's your turn. Click the Start button when you're ready!"
+    }).appendTo(gameID)
+    $("<button/>", {
+        id: 'word-button',
+        html: "Start",
+        click: function() {
+            $("<p/>", {
+                id: 'word-text',
+                html: `Here's your word: ${update.word}`
+
+            }).appendTo(gameID)
+            $('#word-button').hide();
+            $('<button/>', {
+                html: 'Next',
+                click: function(){
+                    socket.emit(Constants.MSG_TYPES.NEXT_WORD, function(data) {
+                        $('#word-text').html("Here's your word: " + data)
+                    })
+                }
+            }).appendTo(gameID)
+            $('<button/>', {
+                html: 'Done with turn',
+                click: function(){
+                    socket.emit(Constants.MSG_TYPES.FINISH_TURN)
+                }
+            }).appendTo(gameID)
         }
-        finishTurnButton.onclick = () => {
-            socket.emit(Constants.MSG_TYPES.FINISH_TURN)
-        }
-        body.appendChild(gotWordButton)
-        body.appendChild(finishTurnButton)
-    }
-    body.appendChild(readyText)
-    body.appendChild(wordTextButton)
+    }).appendTo(gameID)
 }
 
 export function renderGameInfoModal(update) {
     console.log('renderGameInfoModal invoked')
-    var infoModal = document.getElementById(infoModalClassName)
-    infoModal.innerHTML=''
-    var modalList = document.createElement("ul")
-    modalList.style.listStyle="none"
-    // set team number
-    var teamNumber = document.createElement("li")
-    var teamNumberNode = document.createTextNode(`Your Team Number: ${update.team}`)
-    teamNumber.appendChild(teamNumberNode)
-    // set team 1 score
-    var team1Score = document.createElement("li")
-    var team1ScoreNode = document.createTextNode(`Team 1 Score: ${update.team1Score}`)
-    team1Score.appendChild(team1ScoreNode)
-    // set team 2 score
-    var team2Score = document.createElement("li")
-    var team2ScoreNode = document.createTextNode(`Team 2 Score: ${update.team2Score}`)
-    team2Score.appendChild(team2ScoreNode)
+    $(infoModalID).empty()
 
-    // set team 2 score
-    var team2Score = document.createElement("li")
-    var team2ScoreNode = document.createTextNode(`Team 2 Score: ${update.team2Score}`)
-    team2Score.appendChild(team2ScoreNode)
-
-    // set personalScore
-    var personalScore = document.createElement("li")
-    var personalScoreNode = document.createTextNode(`Personal Score: ${update.personalScore}`)
-    personalScore.appendChild(personalScoreNode)
-
-    // set room code
-    var roomCode = document.createElement("li")
-    var roomCodeNode = document.createTextNode(`Room ID: ${update.room}`)
-    roomCode.appendChild(roomCodeNode)
-
-    // set round
-    var round = document.createElement("li")
-    var roundNode = document.createTextNode(`Round: ${update.round}`)
-    round.appendChild(roundNode)
-
-    // set round
-    var username = document.createElement("li")
-    var usernameNode = document.createTextNode(`Your Username: ${update.username}`)
-    username.appendChild(usernameNode)
-
-    modalList.appendChild(teamNumber)
-    modalList.appendChild(team1Score)
-    modalList.appendChild(team2Score)
-    modalList.appendChild(personalScore)
-    modalList.appendChild(round)
-    modalList.appendChild(roomCode)
-    modalList.appendChild(username)
-    infoModal.appendChild(modalList)
+    var modalList = $('<ul/>').css('list-style', 'none').append(
+        $(`<li>Your Team Number: ${update.team}</li>`),
+        $(`<li>Team 1 Score: ${update.team1Score}</li>`),
+        $(`<li>Team 2 Score: ${update.team2Score}</li>`),
+        $(`<li>Personal Score: ${update.personalScore}</li>`),
+        $(`<li>Room ID: ${update.room}</li>`),
+        $(`<li>Round: ${update.round}</li>`),
+        $(`<li>Your Username: ${update.username}</li>`)
+    ).appendTo(infoModalID)
 }
 
 export function renderWhoIsUpNextScreen(update) {
-    var gameBackground = document.getElementsByClassName(gameClassName)[0]
-    gameBackground.innerHTML = ''
-    var currPlayer = document.createElement("h1")
-    currPlayer.innerHTML = `It's ${update.currPlayerName}'s turn`
-    var nextPlayer = document.createElement("h2")
+    $(gameID).empty()
+    $('<h1/>', {
+        html: `It's ${update.currPlayerName}'s turn`
+    }).appendTo(gameID)
     let nextPlayerText = `${update.nextPlayerName} is up next`
     if (update.nextPlayerName === update.username) {
         nextPlayerText = `You're up next!`
     }
-    nextPlayer.innerHTML = nextPlayerText
-    gameBackground.appendChild(currPlayer)
-    gameBackground.appendChild(nextPlayer)
+    $('<h2/>', {
+        html: nextPlayerText
+    }).appendTo(gameID)
 }
 
 export function renderHasStartedScreen() {
      // the code below is really bad. need to refactor this
-     var gameBackground = document.getElementsByClassName(gameClassName)[0]
+     var gameBackground = document.getElementById(gameIDName)
      gameBackground.innerHTML = ''
      
      var instructionsText = document.createElement("strong")
@@ -242,47 +191,46 @@ export function renderHasStartedScreen() {
 }
 
 export function renderInputScreen() {
-    // the code below is really bad. need to refactor this
-    var gameBackground = document.getElementsByClassName(gameClassName)[0]
-    gameBackground.innerHTML = ''
-    
-    var instructionsText = document.createElement("p")
-    instructionsText.innerHTML = "Think of 3-5 prompts and submit them below. Write anything just please be funny, like don't be boring ok."
-    gameBackground.appendChild(instructionsText)
+    $(gameID).empty()
+    $("<p/>", {
+        html: "Think of 3-5 prompts and submit them below. Write anything just please be funny, like don't be boring ok."
+    }).appendTo(gameID)
     for (let i = 0; i < 5; i++) {
-        const input = document.createElement("input")
-        input.id = "input"+i
-        input.placeholder = "Write anything"
-        input.type = "text"
-        gameBackground.appendChild(input)
+        $("<input/>", {
+            id: "input"+i,
+            placeholder: "Write anything",
+            type: "text",
+        }).appendTo(gameID)
     }
-    var button = document.createElement("button");
-    button.innerHTML = "Submit";
-    button.addEventListener ("click", function() {
-        const input1 = document.getElementById('input0');
-        const input2 = document.getElementById('input1');
-        const input3 = document.getElementById('input2');
-        const input4 = document.getElementById('input3');
-        const input5 = document.getElementById('input4');
-        submitWords(input1.value, input2.value, input3.value, input4.value, input5.value);
-        renderReadyButton()
-      });  
-      gameBackground.appendChild(button)
+    $("<button/>", {
+        html: "Submit",
+        click: function() {
+            const input1 = $('#input0').val();
+            const input2 = $('#input1').val();
+            const input3 = $('#input2').val();
+            const input4 = $('#input3').val();
+            const input5 = $('#input4').val();
+            submitWords(input1, input2, input3, input4, input5);
+            renderReadyButton()
+        }
+    }).appendTo(gameID)
 }
 
 export const renderReadyButton = () => {
-    var body = document.getElementsByClassName(gameClassName)[0]
-    body.innerHTML = ''
-    var button = document.createElement("button");
-    button.innerHTML = "Everyone's ready!";
-    button.style.margin = "50px"
-    button.addEventListener ("click", function() {
-        startGame()
-    });
-    var everyoneIsReadyText = document.createElement("strong");
-    everyoneIsReadyText.innerHTML = "Only click this when everyone playing the game has submitted. Otherwise you'll mess everything up ok"
-    body.appendChild(everyoneIsReadyText)
-    body.appendChild(button)
+    $(gameID).empty()
+    $("<strong/>", {
+        html: "Only click this when everyone playing the game has submitted. Otherwise you'll mess everything up ok"
+    }).appendTo(gameID)
+    $("<br/>").appendTo(gameID)
+    $("<button/>", {
+        html: "Everyone's ready",
+        style: {
+            margin: "50px"
+        },
+        click: function() {
+            startGame()
+        }
+    }).appendTo(gameID)
 }
 
 export const startGame = () => {

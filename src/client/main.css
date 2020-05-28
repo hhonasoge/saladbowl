@@ -24,7 +24,13 @@ input {
   font-size: 17px;
 }
 
-.game-background {
+button.styled-button {
+  width: 120px;
+  height: 30px;
+  border-radius: 10px;
+}
+
+#game-background {
   display: grid;
   position: fixed; /* or absolute */
   top: 50%;
@@ -42,14 +48,10 @@ input {
     display: none !important;
 }
 
-button {
-  border-radius: 10px;
-}
-
-button:hover {
+button.styled-button:hover {
   background-color: rgb(230, 230, 230);
 }
   
-button:focus {
-  outline: none;
+button.styled-button:focus {
+  transform: translateY(2px);
 }
